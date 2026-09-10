@@ -308,19 +308,22 @@ export const ESP32_BOARDS: Esp32BoardSpec[] = [
     bootloaderOffset: 0x1000, uploadBaud: 115200, esptoolFlags: [],
     before: 'default_reset', after: 'hard_reset', stub: true, nativeUsb: false,
     ota: true,
-    // Not offered in the browser: no completed write has been measured on this
-    // variant, and `webFlashVerified` records writes, never handshakes. The CLI
-    // path is unaffected — `webFlash` means "offered in the browser", not "may
-    // be written". Flip this only when a hardware run writes one end to end.
-    webFlash: false, webFlashStatus: 'unverified',
-    webFlashVerified: '',
+    // `blocked`, not `unverified`: this was measured, and it cannot work here.
+    // esptool-js never reaches SYNC on this unit's CH340 while esptool.py
+    // connects first try, so the browser surface has no way in. The CLI path is
+    // unaffected in principle — `webFlash` means "offered in the browser", not
+    // "may be written" — but it drives esptool-js too, so USB writes go through
+    // esptool.py until that adapter's reset strategy is solved.
+    webFlash: false, webFlashStatus: 'blocked',
+    webFlashVerified:
+      '2026-09-10 · esptool-js 0.6.1 ClassicReset never syncs (2/2 attempts, "Failed to connect with the device"); esptool.py 5.3.0 connects first try on the same cable and port. Same class as ips_10, whose download mode only UnixTightReset reaches.',
     notes: [
       'Flash size MUST be 4MB here, the exact inverse of the 8MB sibling: partition table copied verbatim from this unit\'s own factory AWTRIX layout, which ends at exactly 0x400000.',
       'Identified 2026-09-10 on an ESP32-D0WD rev v1.1 (MAC d4:e9:f4:d0:90:10) reporting JEDEC mfr 0x46 / device 0x4016. Three agreeing signals: that capacity byte, a stock bootloader header of e9 04 02 20 (0x20 = 4MB/40MHz), and a factory partition table ending exactly at the 4MB boundary.',
       'flashFreq is 40m, not the sibling\'s 80m — mfr 0x46 is not a JEDEC vendor this fleet has characterised, and 40MHz is what its own factory bootloader runs it at.',
       'UNLIKE `ulanzi_tc001`, this unit DOES answer device_info_request over serial (3/3 after its first flash, 2026-09-10) — so the broken CH340 TX recorded on the 8MB sibling is a property of that unit, not of the PCB. It is therefore not in SERIAL_PROBE_UNAVAILABLE: the post-write read-back works and must run.',
       'That makes a positive answer decisive but silence ambiguous: a board answering `ulanzi_tc001_4mb` IS this variant, while no answer is "could not look", never proof of the 8MB one. Read the flash id before flashing; do not infer the variant from the device node.',
-      'esptool-js could not sync this unit at all (ClassicReset, repeatable) while esptool.py connected first try, so the CLI may need `--firmware` plus esptool until that is resolved. First flash was written with esptool.py on 2026-09-10 and verified by NVS init plus a device_info read-back.',
+      'esptool-js could not sync this unit at all (ClassicReset, repeatable) while esptool.py connected first try, so the CLI may need `--firmware` plus esptool until that is resolved. First flash written with esptool.py 2026-09-10 and verified three ways: NVS at 0x9000 carried an ESP-IDF ACTIVE page header after a full-chip erase (only running firmware writes that), a device_info read-back, and a confirmed matrix render.',
     ],
   },
   {

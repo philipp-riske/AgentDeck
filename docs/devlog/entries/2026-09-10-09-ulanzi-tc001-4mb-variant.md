@@ -67,6 +67,15 @@ esptool.py 로 erase + merged 이미지를 0x0 에 썼다(`Hash of data verified
 따라서 판정은 비대칭이다: `ulanzi_tc001_4mb` 라고 답하면 이 변형이 확실하지만, **무응답은
 8MB 라는 증거가 아니라 "확인 불가"** 다. 플래시 전 flash id 읽기는 그대로 유효하다.
 
+매트릭스 렌더까지 육안 확인 — 이 보드의 문서화된 검증 기준(matrix render + WiFi 등록) 중
+첫 번째가 충족됐다. 즉 첫 플래시는 세 갈래로 검증됐다: 전체 erase 후 NVS 초기화, serial
+`device_info` 응답, 그리고 매트릭스 렌더.
+
+`webFlashStatus` 는 `unverified` 가 아니라 **`blocked`** 로 뒀다. "측정 안 했다"가 아니라
+"측정했고 여기서는 안 된다" 이기 때문이다 — esptool-js 는 2/2 로 SYNC 에 못 가고 esptool.py
+는 같은 케이블/포트에서 첫 시도에 붙는다. `ips_10` 과 같은 계열이라 `webFlashVerified` 에
+그 측정을 적어 뒀다(차단의 근거도 근거다).
+
 ### 아직 아닌 것
 
 `webFlash: false` — 이 변형에서 **완료된 쓰기**를 아직 측정하지 않았다. `webFlashVerified`
