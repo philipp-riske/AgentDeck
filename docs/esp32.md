@@ -353,7 +353,7 @@ OTA 대상 SSOT. **`agentdeck esp32-ota <target>`의 `<target>`은 로컬 Platfo
 | **`trmnl_75`**, `inkdeck` | `trmnl_75` | ~3.3MB | Seeed XIAO ESP32-S3 Plus BSP와 일치하도록 8MB layout 유지. `inkdeck` 은 1.2.1 이전 이름 — 그 펌웨어로 남아 있는 보드가 자신을 그렇게 보고하므로 계속 받는다 |
 | **`lilygo_epd47`**, `epd47` | `lilygo_epd47` | ~6.25MB | T5 ePaper S3 N16R8; 4-bit 프레임버퍼는 PSRAM에 1회 할당 |
 | `ulanzi_tc001`, `led8x32` | `led8x32` | ~3.0MB | FastLED matrix, LVGL 미사용 |
-| `ulanzi_tc001_4mb`, `led8x32_4mb` | `led8x32_4mb` | ~1.88MB | 같은 PCB의 4MB flash 유닛 (JEDEC mfr `0x46` / device `0x4016`). 파티션은 공장 AWTRIX layout 그대로 — 0x400000 에서 정확히 끝난다. **8MB 이미지를 쓰면 안 된다**: `app1` 0x310000, `coredump` 0x7F0000 이 파트 끝을 넘어가고 `esp32PreflightVerdict` 가 거부한다. TC001 두 변형 모두 CH340 TX 가 하드웨어적으로 broken 이라 USB 로는 구분이 안 되므로 **플래시 전에 flash id 를 읽을 것** |
+| `ulanzi_tc001_4mb`, `led8x32_4mb` | `led8x32_4mb` | ~1.88MB | 같은 PCB의 4MB flash 유닛 (JEDEC mfr `0x46` / device `0x4016`). 파티션은 공장 AWTRIX layout 그대로 — 0x400000 에서 정확히 끝난다. **8MB 이미지를 쓰면 안 된다**: `app1` 0x310000, `coredump` 0x7F0000 이 파트 끝을 넘어가고 `esp32PreflightVerdict` 가 거부한다. 8MB 형제와 달리 이 유닛은 serial `device_info` 에 **답한다**(2026-09-10 첫 플래시 후 3/3) — broken CH340 TX 는 그 유닛의 성질이지 PCB 의 성질이 아니었다. 그래서 `SERIAL_PROBE_UNAVAILABLE` 에 넣지 않는다. 답이 오면 이 변형이 확실하지만 **무응답은 8MB 라는 증거가 아니라 "확인 불가"** 이므로 **플래시 전에 flash id 를 읽을 것** |
 | **`ttgo_t_display`**, `ttgo` | `ttgo` | ~6.0MB | PSRAM 없는 classic ESP32, 작은 렌더 버퍼 유지 |
 | **`ips_35`**, `ips35` | `ips35` | ~3.5MB | FAT 포함 dual-OTA layout |
 | **`round_amoled`**, `amoled`, `amoled_18` | `amoled` | ~3.0MB | 8MB flash dual-OTA layout |

@@ -128,21 +128,24 @@ describe('parseLsofHolders', () => {
 });
 
 describe('SERIAL_PROBE_UNAVAILABLE', () => {
-  it('names both TC001 variants, whose CH340 TX is broken in hardware', () => {
+  it('names TC001, whose CH340 TX is broken in hardware', () => {
     // Running the post-write probe on this board reports a GOOD flash as a
     // failure, so the exception has to be explicit rather than discovered.
-    // It is the PCB that is broken, so both flash-size variants inherit it —
-    // exempting only the 8MB one would fail every 4MB flash on a working board.
-    for (const id of ['ulanzi_tc001', 'ulanzi_tc001_4mb']) {
-      expect(SERIAL_PROBE_UNAVAILABLE.has(id)).toBe(true);
-      expect(esp32BoardById(id)?.notes.join(' ')).toMatch(/device_info_request/);
-    }
+    expect(SERIAL_PROBE_UNAVAILABLE.has('ulanzi_tc001')).toBe(true);
+    expect(esp32BoardById('ulanzi_tc001')?.notes.join(' ')).toMatch(/device_info_request/);
+  });
+
+  it('does not excuse the 4MB variant, which answers on the same PCB', () => {
+    // The obvious inference — same board, same broken TX — is wrong: the 4MB
+    // unit answered device_info 3/3 on 2026-09-10. Excusing it would skip a
+    // verification that works, which is how a bad flash passes.
+    expect(SERIAL_PROBE_UNAVAILABLE.has('ulanzi_tc001_4mb')).toBe(false);
   });
 
   it('does not excuse any other board', () => {
     // Exact set on purpose: this list turns a failed verification into a pass,
     // so it may only grow for a board with a hardware reason recorded above.
-    expect([...SERIAL_PROBE_UNAVAILABLE]).toEqual(['ulanzi_tc001', 'ulanzi_tc001_4mb']);
+    expect([...SERIAL_PROBE_UNAVAILABLE]).toEqual(['ulanzi_tc001']);
   });
 });
 

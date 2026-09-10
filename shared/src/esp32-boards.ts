@@ -318,8 +318,9 @@ export const ESP32_BOARDS: Esp32BoardSpec[] = [
       'Flash size MUST be 4MB here, the exact inverse of the 8MB sibling: partition table copied verbatim from this unit\'s own factory AWTRIX layout, which ends at exactly 0x400000.',
       'Identified 2026-09-10 on an ESP32-D0WD rev v1.1 (MAC d4:e9:f4:d0:90:10) reporting JEDEC mfr 0x46 / device 0x4016. Three agreeing signals: that capacity byte, a stock bootloader header of e9 04 02 20 (0x20 = 4MB/40MHz), and a factory partition table ending exactly at the 4MB boundary.',
       'flashFreq is 40m, not the sibling\'s 80m — mfr 0x46 is not a JEDEC vendor this fleet has characterised, and 40MHz is what its own factory bootloader runs it at.',
-      'Like `ulanzi_tc001` it does NOT answer device_info_request over serial (same hardware-broken CH340 TX), so the two variants are indistinguishable over USB. Read the flash id before flashing; do not infer the variant from the device node.',
-      'esptool-js could not sync this unit at all (ClassicReset, repeatable) while esptool.py connected first try, so the CLI may need `--firmware` plus esptool until that is resolved.',
+      'UNLIKE `ulanzi_tc001`, this unit DOES answer device_info_request over serial (3/3 after its first flash, 2026-09-10) — so the broken CH340 TX recorded on the 8MB sibling is a property of that unit, not of the PCB. It is therefore not in SERIAL_PROBE_UNAVAILABLE: the post-write read-back works and must run.',
+      'That makes a positive answer decisive but silence ambiguous: a board answering `ulanzi_tc001_4mb` IS this variant, while no answer is "could not look", never proof of the 8MB one. Read the flash id before flashing; do not infer the variant from the device node.',
+      'esptool-js could not sync this unit at all (ClassicReset, repeatable) while esptool.py connected first try, so the CLI may need `--firmware` plus esptool until that is resolved. First flash was written with esptool.py on 2026-09-10 and verified by NVS init plus a device_info read-back.',
     ],
   },
   {
