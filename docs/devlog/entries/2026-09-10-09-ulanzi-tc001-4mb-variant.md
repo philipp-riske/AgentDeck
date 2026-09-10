@@ -76,6 +76,25 @@ esptool.py 로 erase + merged 이미지를 0x0 에 썼다(`Hash of data verified
 는 같은 케이블/포트에서 첫 시도에 붙는다. `ips_10` 과 같은 계열이라 `webFlashVerified` 에
 그 측정을 적어 뒀다(차단의 근거도 근거다).
 
+### WiFi 프로비저닝
+
+데몬의 auto-provision 이 그대로 먹었다 — `wifi-config.json` 의 저장된 자격증명으로 serial
+`wifi_provision` 이 나가고 `[WiFi] Connected via provision: 192.168.2.68`. 이후
+`ESP32 WiFi registered: ulanzi_tc001_4mb:192.168.2.68`. MAC `d4:e9:f4:d0:90:10`,
+Speedport 가 `esp32-d09010.speedport.ip` 로 잡는다. 이로써 이 보드의 문서화된 검증 기준
+두 갈래(matrix render + WiFi 등록)가 모두 충족됐다.
+
+디버깅 중 헛짚은 것 하나: 등록이 안 보이길래 수동으로 `wifi_provision` 을 다시 쏘았는데,
+로그 타임라인을 되짚어 보면 **필요 없는 일이었다**. 데몬이 16:41:19 에 이미 보냈고, 16:43
+과 16:47 재시작이 provision 없이 "token armed" 만 찍은 것이 그 증거다(그 분기는
+`!wifiConnected` 일 때만 탄다). 등록이 안 보였던 이유는 내가 serial 포트를 비우려고 데몬을
+계속 멈췄기 때문이다 — 보드가 붙을 대상이 없었다.
+
+한 가지 알아 둘 것: TC001 의 radio parking 규칙은 `serialConnected && !wifiConnected` 라,
+**아직 한 번도 프로비저닝되지 않은** 유닛은 데몬이 포트를 연 뒤 4초면 라디오를 park 한다.
+WiFi 가 붙은 뒤로는 park 하지 않으므로(주석대로 "WiFi 가 이미 죽은 뒤에만 park") 첫 프로
+비저닝만 그 창을 신경 쓰면 된다.
+
 ### 아직 아닌 것
 
 `webFlash: false` — 이 변형에서 **완료된 쓰기**를 아직 측정하지 않았다. `webFlashVerified`
