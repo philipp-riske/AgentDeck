@@ -843,8 +843,8 @@ final class DaemonServer {
     // generated-mirror boundary, never an independently edited board catalog.
     nonisolated static let surfaceFirmwareBoards: Set<String> = [
         "86box", "ips_35", "round_amoled", "ips_10", "trmnl_75", "nm_epd_420",
-        "lilygo_epd47", "ttgo_t_display", "ulanzi_tc001", "t_embed", "t_display_pro",
-        "esp32_c6_147",
+        "lilygo_epd47", "ttgo_t_display", "ulanzi_tc001", "ulanzi_tc001_4mb",
+        "t_embed", "t_display_pro", "esp32_c6_147",
     ]
     // END GENERATED-SSOT-MIRROR: shared/src/esp32-boards.ts
 

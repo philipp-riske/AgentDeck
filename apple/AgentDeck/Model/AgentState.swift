@@ -468,6 +468,7 @@ extension SerialPortInfo {
         // Ulanzi TC001 is an ESP32 under the hood but sold as a finished
         // product, so surface the brand instead of the raw board name.
         case "ulanzi_tc001":   return "Ulanzi TC001"
+        case "ulanzi_tc001_4mb": return "Ulanzi TC001 (4MB)"
         case .some(let b) where !b.isEmpty: return "ESP32 · \(b)"
         default:               return "ESP32"
         }

@@ -18,7 +18,7 @@ Usage:
 Environments (canonical friendly name — panel/form + inches):
   ips_35 | amoled_18 | box_40 | tft_114 | ips_101 | trmnl_75
   nm_epd_420 | lilygo_epd47
-  t_embed | t_display_pro | led_8x32
+  t_embed | t_display_pro | led_8x32 | led_8x32_4mb
   (legacy aliases still accepted: round_amoled, box_86, knob, ticker, ...)
 
 Rules:
@@ -44,6 +44,7 @@ map_env_to_pio() {
         amoled_18|round_amoled|amoled) echo "amoled" ;;
         box_40|box_86|86box) echo "box_86" ;;
         led_8x32|ulanzi_tc001|led8x32) echo "led8x32" ;;
+        led_8x32_4mb|ulanzi_tc001_4mb|led8x32_4mb) echo "led8x32_4mb" ;;
         tft_114|ttgo_t_display|ttgo) echo "ttgo" ;;
         ips_101|ips_10|ips10) echo "ips10" ;;
         trmnl_75) echo "trmnl_75" ;;
@@ -61,6 +62,7 @@ validate_env() {
         amoled_18|round_amoled|amoled|\
         box_40|box_86|86box|\
         led_8x32|ulanzi_tc001|led8x32|\
+        led_8x32_4mb|ulanzi_tc001_4mb|led8x32_4mb|\
         tft_114|ttgo_t_display|ttgo|\
         ips_101|ips_10|ips10|\
         trmnl_75|nm_epd_420|lilygo_epd47|epd47|\

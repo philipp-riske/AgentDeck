@@ -9,7 +9,7 @@
     #include "board_86_box.h"
 #elif defined(BOARD_AMOLED) || defined(BOARD_ROUND_AMOLED)
     #include "board_round_amoled.h"
-#elif defined(BOARD_LED8X32) || defined(BOARD_ULANZI_TC001)
+#elif defined(BOARD_LED8X32) || defined(BOARD_ULANZI_TC001) || defined(BOARD_LED8X32_4MB)
     #include "board_ulanzi_tc001.h"
 #elif defined(BOARD_TTGO) || defined(BOARD_TTGO_T_DISPLAY)
     #include "board_ttgo_t_display.h"
@@ -44,7 +44,14 @@
  * the wrong answer here silently mis-targets an OTA.
  */
 inline const char* agentdeckBoardName() {
-    #if defined(BOARD_LED8X32) || defined(BOARD_ULANZI_TC001)
+    // The 4MB variant is checked FIRST because its env defines BOARD_LED8X32 too
+    // — it is the same PCB and wants every matrix branch — so an 8MB-first
+    // ladder would silently give both units the same wire id. They must differ:
+    // the id is what `agentdeck esp32-ota` targets, and pushing the 8MB build
+    // to a 4MB unit is exactly the mis-target this function exists to prevent.
+    #if defined(BOARD_LED8X32_4MB)
+        return "ulanzi_tc001_4mb";
+    #elif defined(BOARD_LED8X32) || defined(BOARD_ULANZI_TC001)
         return "ulanzi_tc001";
     #elif defined(BOARD_NM_EPD_420)
         return "nm_epd_420";

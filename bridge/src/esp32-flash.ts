@@ -743,12 +743,14 @@ export interface DeviceIdentity {
 /**
  * Reopen the port at 115200 and wait for the firmware's `device_info`.
  *
- * `ulanzi_tc001` MUST SKIP THIS. Its CH340 TX is broken in hardware, so it
- * never answers any serial probe — running this on a TC001 reports a perfectly
- * good flash as a failure. The exception is named in the SSOT's notes, in
- * docs/esp32.md, and in the browser flasher's done-state copy.
+ * Both TC001 variants MUST SKIP THIS. The CH340 TX is broken in hardware on
+ * that PCB, so neither answers any serial probe — running this on one reports a
+ * perfectly good flash as a failure. It is the PCB that is broken, not one
+ * unit's flash size, so the 4MB variant inherits the exemption. The exception
+ * is named in the SSOT's notes, in docs/esp32.md, and in the browser flasher's
+ * done-state copy.
  */
-export const SERIAL_PROBE_UNAVAILABLE = new Set(['ulanzi_tc001']);
+export const SERIAL_PROBE_UNAVAILABLE = new Set(['ulanzi_tc001', 'ulanzi_tc001_4mb']);
 
 export async function readDeviceIdentity(
   portPath: string,

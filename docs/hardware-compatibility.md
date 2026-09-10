@@ -107,6 +107,7 @@ Rows are ordered by overall capability, applied in this precedence: SoC class, t
 | Waveshare ESP32-C6-LCD-1.47 | `esp32_c6_147` · `esp32_c6_147` | ESP32-C6 | 4 MB · none | 1.47″ IPS LCD · 172×320 | ST7789 | — | — | Native USB CDC | Single app | Shipping |
 | LilyGO T-Display | `ttgo_t_display` · `ttgo` | ESP32 classic | 16 MB · none | 1.14″ IPS LCD · 135×240 | ST7789 SPI | 2 buttons | — | CH340 USB serial | 6 MB | Shipping |
 | Ulanzi TC001 | `ulanzi_tc001` · `led8x32` | ESP32 classic | 8 MB · none | WS2812B LED matrix · 32×8 | WS2812B | 3 buttons | Buzzer on GPIO 15 (silenced at boot) | CH340 USB serial | 3 MB | Shipping |
+| Ulanzi TC001 · 4 MB flash part | `ulanzi_tc001_4mb` · `led8x32_4mb` | ESP32 classic | 4 MB · none | WS2812B LED matrix · 32×8 | WS2812B | 3 buttons | Buzzer on GPIO 15 (silenced at boot) | CH340 USB serial | 1.88 MB | Shipping |
 
 ### E-ink control and audio capability
 

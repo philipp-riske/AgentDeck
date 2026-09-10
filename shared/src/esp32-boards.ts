@@ -293,6 +293,36 @@ export const ESP32_BOARDS: Esp32BoardSpec[] = [
     ],
   },
   {
+    // Same PCB as `ulanzi_tc001` — GPIO32 / GRB / 32x8, one firmware, one UX.
+    // It is a separate board ONLY because its flash part is 4MB, and that is
+    // not a detail the flasher may paper over: the 8MB partition table puts
+    // app1 at 0x310000 and coredump at 0x7F0000, past the end of this part.
+    //
+    // It carries its own WIRE id rather than reporting `ulanzi_tc001`, because
+    // the id is what `agentdeck esp32-ota <target>` resolves. Sharing one id
+    // would make the 8MB build a legal OTA payload for a 4MB unit, which is the
+    // same brick arriving over WiFi instead of USB.
+    id: 'ulanzi_tc001_4mb', env: 'led8x32_4mb', name: 'Ulanzi TC001 (4MB)', display: '32x8 WS2812B matrix',
+    aliases: ['led8x32_4mb'],
+    chipFamily: 'ESP32', flashSize: '4MB', flashMode: 'dio', flashFreq: '40m',
+    bootloaderOffset: 0x1000, uploadBaud: 115200, esptoolFlags: [],
+    before: 'default_reset', after: 'hard_reset', stub: true, nativeUsb: false,
+    ota: true,
+    // Not offered in the browser: no completed write has been measured on this
+    // variant, and `webFlashVerified` records writes, never handshakes. The CLI
+    // path is unaffected — `webFlash` means "offered in the browser", not "may
+    // be written". Flip this only when a hardware run writes one end to end.
+    webFlash: false, webFlashStatus: 'unverified',
+    webFlashVerified: '',
+    notes: [
+      'Flash size MUST be 4MB here, the exact inverse of the 8MB sibling: partition table copied verbatim from this unit\'s own factory AWTRIX layout, which ends at exactly 0x400000.',
+      'Identified 2026-09-10 on an ESP32-D0WD rev v1.1 (MAC d4:e9:f4:d0:90:10) reporting JEDEC mfr 0x46 / device 0x4016. Three agreeing signals: that capacity byte, a stock bootloader header of e9 04 02 20 (0x20 = 4MB/40MHz), and a factory partition table ending exactly at the 4MB boundary.',
+      'flashFreq is 40m, not the sibling\'s 80m — mfr 0x46 is not a JEDEC vendor this fleet has characterised, and 40MHz is what its own factory bootloader runs it at.',
+      'Like `ulanzi_tc001` it does NOT answer device_info_request over serial (same hardware-broken CH340 TX), so the two variants are indistinguishable over USB. Read the flash id before flashing; do not infer the variant from the device node.',
+      'esptool-js could not sync this unit at all (ClassicReset, repeatable) while esptool.py connected first try, so the CLI may need `--firmware` plus esptool until that is resolved.',
+    ],
+  },
+  {
     id: 't_embed', env: 't_embed', name: 'T-Embed CC1101', display: '1.9" 320x170 ST7789',
     aliases: ['tembed', 'knob'],
     chipFamily: 'ESP32-S3', flashSize: '16MB', flashMode: 'dio', flashFreq: '80m',

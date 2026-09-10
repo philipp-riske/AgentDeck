@@ -1,0 +1,12 @@
+# Name,   Type, SubType, Offset,  Size, Flags
+# 4MB flash layout for the Ulanzi TC001 units built with a 4MB part
+# (JEDEC mfr 0x46 / device 0x4016). Geometry copied VERBATIM from the factory
+# AWTRIX table read off such a unit at 0x8000 on 2026-09-10: it ends exactly at
+# 0x400000, which is the proof it was designed for this part rather than
+# trimmed to fit. Dual OTA slots are kept — 0x1E0000 holds the ~1.2MB matrix
+# firmware with room to spare, so `agentdeck esp32-ota` stays available.
+nvs,      data, nvs,     0x9000,  0x5000,
+otadata,  data, ota,     0xe000,  0x2000,
+app0,     app,  ota_0,   0x10000, 0x1E0000,
+app1,     app,  ota_1,   0x1F0000,0x1E0000,
+spiffs,   data, spiffs,  0x3D0000,0x30000,

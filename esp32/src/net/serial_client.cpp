@@ -1,5 +1,6 @@
 #include "serial_client.h"
 #include "protocol.h"
+#include "../../boards/board_config.h"  // agentdeckBoardName()
 #include "wifi_manager.h"
 #include "wifi_cred_id.generated.h"
 #include "ws_client.h"
@@ -94,31 +95,15 @@ static void sendDeviceInfoSerial() {
     JsonDocument resp;
     resp["type"] = "device_info";
 
-    #if defined(BOARD_LED8X32)
-    resp["board"] = "ulanzi_tc001";
-    #elif defined(BOARD_NM_EPD_420)
-    resp["board"] = "nm_epd_420";
-    #elif defined(BOARD_LILYGO_EPD47)
-    resp["board"] = "lilygo_epd47";
-    #elif defined(BOARD_TRMNL_75)
-    resp["board"] = "trmnl_75";
-    #elif defined(BOARD_TTGO)
-    resp["board"] = "ttgo_t_display";
-    #elif defined(BOARD_T_EMBED)
-    resp["board"] = "t_embed";
-    #elif defined(BOARD_T_DISPLAY_PRO)
-    resp["board"] = "t_display_pro";
-    #elif defined(BOARD_ESP32_C6_147)
-    resp["board"] = "esp32_c6_147";
-    #elif IS_ROUND
-    resp["board"] = "round_amoled";
-    #elif defined(BOARD_BOX_86) || defined(BOARD_86_BOX)
-    resp["board"] = "86box";
-    #elif defined(BOARD_IPS10)
-    resp["board"] = "ips_10";
-    #else
-    resp["board"] = "ips_35";
-    #endif
+    // The SECOND producer of the wire id, and deliberately not a second #ifdef
+    // ladder: board_config.h says in as many words that a second ladder is how
+    // the two come to disagree, and this file had grown one anyway. The two
+    // were already not the same test — the copy here branched on IS_ROUND
+    // rather than BOARD_AMOLED and did not accept the BOARD_JC8012P4A1C
+    // spelling of ips_10. No env selects that spelling today, so nothing had
+    // mis-reported yet; the point is that only one of the two ladders would
+    // have been updated when one did. One call, one answer.
+    resp["board"] = agentdeckBoardName();
 
     resp["version"] = FIRMWARE_VERSION;
     resp["buildHash"] = GIT_SHA;
