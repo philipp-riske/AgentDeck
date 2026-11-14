@@ -210,6 +210,23 @@ export const ESP32_BOARDS: Esp32BoardSpec[] = [
     ],
   },
   {
+    id: 'reterminal_e1001', env: 'reterminal_e1001', name: 'Seeed reTerminal E1001',
+    display: '7.5" 800x480 e-ink UC8179',
+    aliases: ['e1001'],
+    chipFamily: 'ESP32-S3', flashSize: '8MB', flashMode: 'dio', flashFreq: '80m',
+    bootloaderOffset: 0x0, uploadBaud: 115200, esptoolFlags: [],
+    before: 'default_reset', after: 'hard_reset', stub: true, nativeUsb: false,
+    ota: true,
+    webFlash: false, webFlashStatus: 'unverified',
+    webFlashVerified:
+      '2026-11-14 · `agentdeck esp32 flash` (CLI, not the browser) over the CH340K (1a86:7523): ESP32-S3 (QFN56) rev v0.2, 8MB detected, wrote the 1.6MB merged image at 115200 and MD5-verified in 95 s. 460800 aborted at 80% with a serial-port error. Browser flashing has not been measured.',
+    notes: [
+      'Same GDEY075T7/UC8179 800x480 panel as TRMNL 7.5", so the firmware reuses the TRMNL 7.5" render tree; only pins, identity and the serial transport differ.',
+      'USB is a CH340K bridge on UART0 (GPIO43/44), not the S3 native USB: the firmware runs Serial on UART0 (CDC_ON_BOOT=0). A trmnl_75 image boots on this board with a blank panel and no serial answer — it drives the XIAO pin map and speaks over a USB port that is not wired out.',
+      'Battery-capable: AgentDeck keeps the radio and panel powered like every other board and does not deep-sleep, so run it on USB power.',
+    ],
+  },
+  {
     id: 'nm_epd_420', env: 'nm_epd_420', name: 'RockBase NM-EPD-420',
     display: '4.2" 400x300 tri-color e-ink GDEY042Z98',
     aliases: [],

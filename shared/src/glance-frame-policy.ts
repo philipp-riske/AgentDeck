@@ -18,6 +18,11 @@ export const GLANCE_POLICY = {
       "height": 480,
       "landscape": true
     },
+    "reterminal_e1001": {
+      "width": 800,
+      "height": 480,
+      "landscape": true
+    },
     "nm_epd_420": {
       "width": 400,
       "height": 300,

@@ -137,6 +137,16 @@ AgentDeck's wired e-ink status panel. The hardware is a **Seeed TRMNL 7.5" OG DI
 
 **The commercial BYOS pull integration — removed.** AgentDeck previously drove this same physical panel through TRMNL's own **BYOS** (Bring Your Own Server) pull contract, where the panel polled `/api/setup` + `/api/display` and downloaded a server-rendered PNG. That integration was **removed** (Node commit `c71044bd`; the App Store Swift `Trmnl*` modules removed alongside). Stock / commercial TRMNL panels running the upstream `usetrmnl/firmware` are **no longer supported**: AgentDeck reflashes the same hardware with its own firmware and treats it as a first-class ESP32 board. The name is shared with the kit, the protocol is not.
 
+## reTerminal E1001 e-ink (custom firmware)
+
+The **Seeed reTerminal E1001** is a finished 7.5" e-paper terminal with the same GDEY075T7 / UC8179 800×480 panel as the TRMNL 7.5" kit, so its firmware (PlatformIO env and board id `reterminal_e1001`) reuses the TRMNL 7.5" render tree. Only three things differ, all in `esp32/boards/board_reterminal_e1001.h` and `[env:reterminal_e1001]`:
+
+- **Pins.** The e-paper sits on SCK 7 / MOSI 9 / CS 10 / DC 11 / RST 12 / BUSY 13, and the front keys are GPIO3 (green), GPIO4 and GPIO5, all active low.
+- **Serial transport.** USB reaches the ESP32-S3 through a **CH340K USB-UART bridge on UART0**, not the S3's native USB, so `Serial` is UART0 (`ARDUINO_USB_CDC_ON_BOOT=0`). A `trmnl_75` image boots on this board with a blank panel and no serial answer, because it drives the XIAO pin map and talks over a USB port that is not wired out.
+- **Upload speed.** USB flashing is pinned to 115200: on the first flash, 460800 through the CH340 aborted at 80%.
+
+The CH340 drives EN/IO0, so the flasher enters download mode without a button press. The battery, buzzer (GPIO45), status LED (GPIO6), SHT4x and PCF8563 are not used yet, and the firmware does not deep-sleep, so run the board on USB power.
+
 ## XTeink X3 / X4 (external-fork client)
 
 **XTeink X3 and X4** are ESP32-C3 e-ink readers supported by the independent [Pocket Daily Reader](https://github.com/puritysb/pocket-daily-reader), **not** by AgentDeck's own `esp32/` firmware. Its `src/agentdeck/` compatibility module is a hand-port of the bounded AgentDeck client contract and adds offline-first Feed/Glance/Outbox operation. **One firmware** auto-detects the model at runtime (`gpio.deviceIsX3()`, via an I2C IMU fingerprint) and reports `xteink_x3` or `xteink_x4`. AgentDeck treats it as a Compatible Companion Project with its own product identity and releases.

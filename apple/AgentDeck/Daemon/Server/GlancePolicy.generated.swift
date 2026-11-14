@@ -2,7 +2,7 @@
 #if os(macOS)
 enum GlancePolicy {
     static let revision = "resvg-js-2.6.2-3495d870-v1"
-    static let policySig = "6ce8c73b"
+    static let policySig = "06662e44"
     static let fontSig = "9e8858b6"
     static let fonts: [String] = ["IBMPlexSans-Regular.ttf","IBMPlexSans-Bold.ttf","JetBrainsMono-Regular.ttf","JetBrainsMono-Bold.ttf","IBMPlexSansKR-Regular.ttf","IBMPlexSansKR-Bold.ttf","IBMPlexSansJP-Regular.ttf","IBMPlexSansJP-Bold.ttf"]
     static let bayer: [[UInt8]] = [[8,135,40,167],[199,72,231,104],[56,183,24,151],[247,120,215,88]]
@@ -13,6 +13,7 @@ enum GlancePolicy {
         "xteink_x3": .init(width: 528, height: 792, landscape: false, rotate: true),
         "xteink_x4": .init(width: 800, height: 480, landscape: true, rotate: false),
         "trmnl_75": .init(width: 800, height: 480, landscape: true, rotate: false),
+        "reterminal_e1001": .init(width: 800, height: 480, landscape: true, rotate: false),
         "nm_epd_420": .init(width: 400, height: 300, landscape: true, rotate: false),
         "lilygo_epd47": .init(width: 960, height: 540, landscape: true, rotate: false),
     ]

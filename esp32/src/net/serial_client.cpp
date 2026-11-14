@@ -100,6 +100,8 @@ static void sendDeviceInfoSerial() {
     resp["board"] = "nm_epd_420";
     #elif defined(BOARD_LILYGO_EPD47)
     resp["board"] = "lilygo_epd47";
+    #elif defined(BOARD_RETERMINAL_E1001)
+    resp["board"] = "reterminal_e1001";
     #elif defined(BOARD_TRMNL_75)
     resp["board"] = "trmnl_75";
     #elif defined(BOARD_TTGO)

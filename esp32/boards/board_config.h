@@ -21,6 +21,9 @@
     #include "board_nm_epd_420.h"
 #elif defined(BOARD_LILYGO_EPD47)
     #include "board_lilygo_epd47.h"
+#elif defined(BOARD_RETERMINAL_E1001)
+    // Before BOARD_TRMNL_75: this env defines both (shared 7.5" paper family)
+    #include "board_reterminal_e1001.h"
 #elif defined(BOARD_TRMNL_75)
     #include "board_trmnl_75.h"
 #elif defined(BOARD_T_EMBED)
@@ -50,6 +53,8 @@ inline const char* agentdeckBoardName() {
         return "nm_epd_420";
     #elif defined(BOARD_LILYGO_EPD47)
         return "lilygo_epd47";
+    #elif defined(BOARD_RETERMINAL_E1001)
+        return "reterminal_e1001";
     #elif defined(BOARD_TRMNL_75)
         return "trmnl_75";
     #elif defined(BOARD_TTGO) || defined(BOARD_TTGO_T_DISPLAY)

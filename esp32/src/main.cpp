@@ -1223,7 +1223,8 @@ void setup() {
     // 2048 truncated it mid-line ([Protocol] JSON error: InvalidInput).
     Serial.setRxBufferSize(8192);
 #endif
-#if ARDUINO_USB_MODE == 1
+#if ARDUINO_USB_MODE == 1 && ARDUINO_USB_CDC_ON_BOOT
+    // (Serial is UART0, not HWCDC, on CDC_ON_BOOT=0 boards such as reTerminal E1001.)
     // HWCDC-only knobs (TinyUSB's USBCDC has neither): grow the 256-byte TX
     // ring and widen the give-up timeout — HWCDC drops whole 64-byte FIFO
     // blocks mid-line otherwise. TRMNL 7.5" now ships TinyUSB (USB_MODE=0), so
@@ -1263,6 +1264,10 @@ void setup() {
     for (int i = 0; i < 30 && !Serial; i++) delay(100);
     delay(200);
     Serial.println("\n=== AgentDeck LilyGo T5 4.7\" e-ink ===");
+#elif defined(BOARD_RETERMINAL_E1001)
+    // CH340K UART0: no CDC wait needed
+    delay(200);
+    Serial.println("\n=== AgentDeck reTerminal E1001 7.5\" e-ink ===");
 #elif defined(BOARD_TRMNL_75)
     // Native USB CDC: wait for host connection (up to 3 seconds)
     for (int i = 0; i < 30 && !Serial; i++) delay(100);
@@ -1296,6 +1301,8 @@ void setup() {
         "NM-EPD-420 4.2\" e-ink",
 #elif defined(BOARD_LILYGO_EPD47)
         "LilyGo T5 4.7\" e-ink",
+#elif defined(BOARD_RETERMINAL_E1001)
+        "reTerminal E1001 7.5\" e-ink",
 #elif defined(BOARD_TRMNL_75)
         "TRMNL 7.5\" e-ink",
 #elif defined(BOARD_T_EMBED)

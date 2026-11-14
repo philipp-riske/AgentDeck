@@ -351,6 +351,7 @@ OTA 대상 SSOT. **`agentdeck esp32-ota <target>`의 `<target>`은 로컬 Platfo
 | Target aliases | PlatformIO env | OTA slot size | 운영 메모 |
 |---|---|---:|---|
 | **`trmnl_75`**, `inkdeck` | `trmnl_75` | ~3.3MB | Seeed XIAO ESP32-S3 Plus BSP와 일치하도록 8MB layout 유지. `inkdeck` 은 1.2.1 이전 이름 — 그 펌웨어로 남아 있는 보드가 자신을 그렇게 보고하므로 계속 받는다 |
+| **`reterminal_e1001`**, `e1001` | `reterminal_e1001` | ~3.3MB | TRMNL 7.5"와 같은 GDEY075T7 패널·렌더 트리. USB는 CH340K(UART0)라 `Serial`=UART0(CDC_ON_BOOT=0); USB 업로드는 115200 고정(460800은 80%에서 중단) |
 | **`lilygo_epd47`**, `epd47` | `lilygo_epd47` | ~6.25MB | T5 ePaper S3 N16R8; 4-bit 프레임버퍼는 PSRAM에 1회 할당 |
 | `ulanzi_tc001`, `led8x32` | `led8x32` | ~3.0MB | FastLED matrix, LVGL 미사용 |
 | **`ttgo_t_display`**, `ttgo` | `ttgo` | ~6.0MB | PSRAM 없는 classic ESP32, 작은 렌더 버퍼 유지 |

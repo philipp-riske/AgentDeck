@@ -842,7 +842,8 @@ final class DaemonServer {
     // TypeScript workspace module, so this exact product allow-list is a
     // generated-mirror boundary, never an independently edited board catalog.
     nonisolated static let surfaceFirmwareBoards: Set<String> = [
-        "86box", "ips_35", "round_amoled", "ips_10", "trmnl_75", "nm_epd_420",
+        "86box", "ips_35", "round_amoled", "ips_10", "trmnl_75", "reterminal_e1001",
+        "nm_epd_420",
         "lilygo_epd47", "ttgo_t_display", "ulanzi_tc001", "t_embed", "t_display_pro",
         "esp32_c6_147",
     ]
