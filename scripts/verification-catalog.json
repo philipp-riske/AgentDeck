@@ -1325,6 +1325,7 @@
     }
   ],
   "not_a_gate": {
+    ".github/workflows/sync-fork.yml": "Fork-only maintenance: merges upstream master into this fork daily via the merge-upstream API. Verifies nothing about the product.",
     ".github/workflows/local-deploy.yml": "Post-merge deployment to the owner’s Mac: builds and tests before replacing the app, restarts the supervised daemon and verifies build identity and plugin runtime. Not a pre-merge gate or public release.",
     ".github/workflows/asc-certificates.yml": "Manual App Store Connect certificate maintenance, status readback and guarded per-platform review preparation/submission with exact upload provenance and checksummed 2.0 media; delivery actions do not verify product behavior."
   },

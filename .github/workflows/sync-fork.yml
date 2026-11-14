@@ -1,0 +1,46 @@
+name: Sync fork with upstream
+
+# Keeps master of this fork in sync with puritysb/AgentDeck.
+# Uses GitHub's merge-upstream API: fast-forward when possible, otherwise a
+# merge commit (so fork-only commits such as this workflow survive).
+#
+# Token: GITHUB_TOKEN may never write files under .github/workflows/, and
+# upstream changes those often. Add a repo secret SYNC_TOKEN (fine-grained PAT
+# for this repo with "Contents: read/write" + "Workflows: read/write", or a
+# classic PAT with `repo` + `workflow`). Without it the job falls back to
+# GITHUB_TOKEN and fails whenever upstream touched a workflow file.
+
+on:
+  schedule:
+    - cron: '17 4 * * *' # daily 04:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-fork
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: github.repository != 'puritysb/AgentDeck'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Merge upstream into master
+        env:
+          GH_TOKEN: ${{ secrets.SYNC_TOKEN || github.token }}
+          REPO: ${{ github.repository }}
+          BRANCH: master
+        run: |
+          set -euo pipefail
+          if ! out=$(gh api -X POST "repos/${REPO}/merge-upstream" -f branch="${BRANCH}" 2>&1); then
+            echo "::error::Sync failed: ${out}"
+            echo "If this mentions 'workflow' permission, set the SYNC_TOKEN secret."
+            echo "If it is a merge conflict, merge upstream locally: git fetch upstream && git merge upstream/${BRANCH}"
+            exit 1
+          fi
+          echo "${out}"
+          echo "### Fork sync" >> "$GITHUB_STEP_SUMMARY"
+          echo "${out}" | jq -r '"- merge_type: \(.merge_type)\n- \(.message)"' >> "$GITHUB_STEP_SUMMARY"
