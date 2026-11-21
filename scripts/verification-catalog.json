@@ -1,8 +1,8 @@
 {
   "$comment": "What AgentDeck verifies, where, and what it does not. Rendered as the 'What we verify' tab of the GitHub Pages Build Health report (scripts/generate-html-report.py). Gated by scripts/__tests__/verification-catalog.test.ts: every workflow must be listed, every path must exist, and every test file must match a domain (domains are ordered; the first match wins). Edit this file in the same commit as a new gate, workflow or test area. Gate fields: `blocking` means a failure turns its workflow red; `required` means master branch protection lists the gate's check, so GitHub refuses the merge while it fails. Branch protection is a repository setting that CI cannot read, so `merge_policy.as_of` records when `required` was last checked against it.",
   "merge_policy": {
-    "as_of": "2026-11-05",
-    "summary": "Branch protection on master requires ESP32 simulator, modern TTGO and legacy TC001 build checks, npm/Python/Rust dependency audits, dependency review, all eight hosted-validated CodeQL analysis jobs, the CodeQL result check and security pipeline freshness. Administrator enforcement and up-to-date branch checks are enabled. Target build and native analysis jobs are promoted only after hosted validation."
+    "as_of": "2026-11-20",
+    "summary": "Master requires Product verification for applicable product suites, the ESP32 simulator, TTGO and TC001 builds, dependency audits and review, CodeQL checks and security pipeline freshness. Administrator enforcement and up-to-date branch checks are enabled."
   },
   "levels": {
     "unit": "One module in isolation; collaborators faked.",
@@ -49,7 +49,7 @@
       "name": "Vobot pairing and attention regressions",
       "gate": "vobot-python",
       "tiers": ["changed", "quick", "full"],
-      "run": "python3 integrations/vobot/test_pairing.py && python3 integrations/vobot/test_attention.py && python3 integrations/vobot/test_tls_peer.py && python3 integrations/vobot/test_tls_transport.py",
+      "run": "python3 integrations/vobot/test_pairing.py && python3 integrations/vobot/test_attention.py && python3 integrations/vobot/test_display.py && python3 integrations/vobot/test_tls_peer.py && python3 integrations/vobot/test_tls_transport.py",
       "requires": { "commands": ["python3"] },
       "paths": ["integrations/vobot/**"]
     },
@@ -435,9 +435,9 @@
       "workflow": ".github/workflows/ci.yml",
       "job": "vobot-python",
       "blocking": true,
-      "command": "python3 integrations/vobot/test_pairing.py && python3 integrations/vobot/test_attention.py && python3 integrations/vobot/test_tls_peer.py && python3 integrations/vobot/test_tls_transport.py",
-      "evidence": ["integrations/vobot/test_pairing.py", "integrations/vobot/test_attention.py", "integrations/vobot/test_tls_peer.py", "integrations/vobot/test_tls_transport.py"],
-      "proves": ["Pairing redemption and credential-file cleanup on CPython with loopback sockets and temporary files.", "Attention state transitions with mocked display peripherals.", "TLS peer pin and validity policy, bounded response parsing and credential withholding before peer verification with mocked sockets."],
+      "command": "python3 integrations/vobot/test_pairing.py && python3 integrations/vobot/test_attention.py && python3 integrations/vobot/test_display.py && python3 integrations/vobot/test_tls_peer.py && python3 integrations/vobot/test_tls_transport.py",
+      "evidence": ["integrations/vobot/test_pairing.py", "integrations/vobot/test_attention.py", "integrations/vobot/test_display.py", "integrations/vobot/test_tls_peer.py", "integrations/vobot/test_tls_transport.py"],
+      "proves": ["Pairing redemption and credential-file cleanup on CPython with loopback sockets and temporary files.", "Attention state transitions with mocked display peripherals.", "Host display sleep and dim mapping to the dock LCD and rear light with mocked peripherals.", "TLS peer pin and validity policy, bounded response parsing and credential withholding before peer verification with mocked sockets."],
       "does_not_prove": ["MicroPython firmware compatibility, physical device settings lifecycle, filesystem isolation, TLS or server-enforced least privilege.", "Gallery packaging or publication; this check does not establish physical device acceptance."]
     },
     {
@@ -937,6 +937,20 @@
       ]
     },
     {
+      "id": "product-verification",
+      "name": "Product verification",
+      "level": ["integration"],
+      "where": "GitHub Actions",
+      "workflow": ".github/workflows/ci.yml",
+      "job": "product",
+      "required": true,
+      "trigger": "Every pull request to master",
+      "blocking": true,
+      "command": "Check all product job conclusions against the changed paths",
+      "proves": ["Required product suites completed, including applicable Apple and Android suites"],
+      "does_not_prove": ["Physical device behaviour or release signing"]
+    },
+    {
       "id": "pages-report",
       "name": "This report",
       "level": [
@@ -949,9 +963,9 @@
       "job": "report",
       "trigger": "Every push to master",
       "blocking": false,
-      "command": "vitest --coverage, pnpm test:e2e, gradlew testDebugUnitTest, then generate-html-report.py",
+      "command": "Restore CI artifacts from the same workflow run, then generate-html-report.py",
       "proves": [
-        "re-runs the Vitest, E2E and Android suites on the merged master commit and publishes every result"
+        "publishes the merged commit’s Vitest and E2E results, and Android results when the suite applied"
       ],
       "does_not_prove": [
         "Apple, hardware or release gates — those run in their own workflows and are linked, not re-run here"
@@ -1114,7 +1128,7 @@
         "security/snyk-baseline.json"
       ],
       "proves": [
-        "Snyk Open Source (pnpm workspaces, Android release/sideload runtime) and Snyk Code ran with the repository token; findings absent from the triaged baseline open or update one tracking issue; raw results are kept for 90 days."
+        "Snyk compares workspace and Android runtime dependencies and source findings against the baseline. New findings trigger a count-only tracking issue. The 90-day receipt contains aggregate counts."
       ],
       "does_not_prove": [
         "Anything CodeQL and the dependency audits do not; the 2026-11-08 trial found neither tool reported the three published advisories. Warnings and notes in the baseline were recorded without individual review. It never fails a PR."
@@ -1312,14 +1326,15 @@
         "static",
         "compile"
       ],
-      "where": "macos-26",
+      "where": "macos-26-intel (Ubuntu for prose-only PR decisions)",
       "workflow": ".github/workflows/codeql.yml",
       "job": "swift",
-      "trigger": "Every PR, master push, weekly and manual",
+      "trigger": "PRs check scope first. Master pushes, weekly and manual runs always analyze both Swift targets.",
       "blocking": true,
       "required": true,
       "command": "xcodebuild build -scheme AgentDeck_macOS CODE_SIGNING_ALLOWED=NO",
       "proves": [
+        "An allowlisted prose-only PR records the omission under both required job names. Unknown scope runs both builds.",
         "Clean manual macOS and iOS Simulator builds supply Swift sources to security-extended queries; build, extraction or analysis failure fails the job."
       ],
       "does_not_prove": [
@@ -1688,6 +1703,7 @@
         "scripts/__tests__/native-palette.test.ts",
         "scripts/__tests__/app-icons.test.ts",
         "scripts/__tests__/verification-catalog.test.ts",
+        "scripts/__tests__/codeql-swift-scope.test.ts",
         "scripts/__tests__/apple-dot-build.test.ts",
         "scripts/__tests__/local-main-deploy.test.ts",
         "scripts/__tests__/android-install.test.ts",
