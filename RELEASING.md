@@ -111,12 +111,39 @@ above and PR review own that judgment. After delivery, update the
 [README release table](README.md#releases) and the per-channel receipt from
 observed portal/artifact state; do not present a candidate as public.
 
+### macOS 2.2.2 draft decision (2026-11-21)
+
+| Target / route | Last verified public build | Draft | Proposed build | User-visible reason |
+| --- | --- | --- | --- | --- |
+| macOS / Mac App Store | 2.2.0 / 11901 | 2.2.2, Prepare for Submission | Next CI-assigned macOS build | Patch for the existing 2.2 device support. Compatible devices with an opted-in TLS connection can receive display power and dimming state when authorized. The Store listing regains the aquarium preview and ordered screenshots. |
+
+The [public macOS build](https://github.com/puritysb/AgentDeck/actions/runs/43679291879)
+came from `f9dd73e21424`. Use a macOS-only Xcode 27 workflow dispatch for
+2.2.2. The [verified draft media](https://github.com/puritysb/AgentDeck/issues/806#issuecomment-7063659448)
+contains seven screenshots and one preview per locale. Keep manual release
+selected and hold submission. The separate iOS 2.2.1 TestFlight delivery remains
+on its own build.
+
+**App Store Connect readback (2026-11-21 23:56 KST).** The [macOS-only upload run](https://github.com/puritysb/AgentDeck/actions/runs/44911991871)
+used Xcode 27.1 to archive and verify the exported PKG from `8e67e3ef7925`.
+Apple processed build **12801** as `VALID`, and the build is attached to macOS
+2.2.2. English (US), Korean and Japanese What's New text matches the
+[prepared copy](docs/appstore-metadata-draft.md#prepared-macos-222-update-text).
+Each locale retains the verified seven screenshots and one processed preview.
+The draft stays in `PREPARE_FOR_SUBMISSION` with manual release selected.
+App Store Connect lists no active macOS review submission.
+
+The [pre-release verification receipt](verification/receipts/2026-11-21-8e67e3e.json)
+records the passing automated run, including the macOS Release build,
+XCTest and App Store submission bundle checks. Physical lab checks were
+unattested in that run.
+
 ### Apple 2.2.1 release decision (2026-11-20)
 
 Readback first: App Store Connect (`asc-certificates.yml store-status`, run
 44664584186, 2026-11-20) reports **iOS 2.2.0 and macOS 2.2.0 both
 `READY_FOR_SALE`**, from review submissions of 2026-11-15 (iOS 11:20Z, macOS
-11:11Z, both `COMPLETE`). The latest processed build is 12101. No
+11:11Z, both `COMPLETE`). The latest processed build at that readback was 12101. No
 `apple-v2.2.0` tag exists; the 2.2.0 decision below remains the scope record.
 
 | Target / routes | Last verified public version | Uploaded/reserved version + build | Proposed version + build | Class and user-visible reason | Product milestone / applicability |
@@ -130,6 +157,11 @@ which would build and upload both platforms. The build goes to an external
 TestFlight group so the #799 reporter can verify it on hardware before App Store
 submission. Evidence so far is the iPhone Duo simulator (iOS 27.1) and
 `DashboardFoldLayoutTests`.
+
+Delivery readback on November 21: iOS 2.2.1 build 12601 was uploaded at
+11:15 KST ([CI log](https://github.com/puritysb/AgentDeck/actions/runs/44852515661)).
+The public version on both Apple storefronts remained 2.2.0. External tester
+assignment for build 12601 was not confirmed in that readback.
 
 ### Stream Deck and Ulanzi 2.1.1 marketplace submissions
 
@@ -3803,26 +3835,28 @@ looking correct while the server still holds the previous text.
 
 CI owns `CURRENT_PROJECT_VERSION` — `apple-release.yml` injects `github.run_number * 100 + github.run_attempt` into both archive steps, so the build number rises on every run and ASC never sees a duplicate `(version, build)` pair. Do not bump it by hand; the value in `apple/project.yml` is only a local-build default.
 
-#### iOS archives need the iOS 27 SDK (ITMS-90725)
+#### Apple release toolchain (ITMS-90725)
 
 iOS 2.2.1 build 12201 (2026-11-20) was archived on `macos-15` with Xcode 26.3
 and App Store Connect flagged ITMS-90725: from April 2027 iOS and iPadOS
 uploads and submissions must be built with the iOS 27 SDK (Xcode 27+).
-GitHub-hosted macOS images stopped at Xcode 26.6 on that date, so
-`apple-release.yml` takes `ios_runner: self-hosted-xcode27` on a manual
-dispatch. That job runs on an **ephemeral** runner registered on a maintainer
-Mac for exactly one job, with the label `agentdeck-xcode27`, and deregisters
-when the job ends. The repository is public, so never leave a persistent
-self-hosted runner attached.
+The iOS and macOS release jobs and the Apple product CI builds now use
+GitHub's hosted [Xcode 27 image](https://github.com/actions/runner-images/blob/main/images/macos/xcode-27-arm64-Readme.md).
+Both tag and manual release archives check the selected Xcode and the SDKs
+before importing signing assets. A manual iOS dispatch can still select
+`ios_runner: self-hosted-xcode27` for the fallback. Register that runner for
+exactly one job, with the label `agentdeck-xcode27`, and let it deregister when
+the job ends.
 
-The job runs as the maintainer's user, so it must not touch that user's state:
+The fallback job runs as the maintainer's user, so it must not touch that user's state:
 Xcode is chosen with `DEVELOPER_DIR` (no `sudo xcode-select`), the signing
 keychain is prepended to the saved search list and the list is restored by
 `apple/scripts/cleanup-ci-signing-assets.sh`, only provisioning profiles the
 job added are removed, and the ASC key lives in `$RUNNER_TEMP/private_keys`
 (`API_PRIVATE_KEYS_DIR`), never `~/private_keys`. The step fails unless the
-selected Xcode is 27 or later. Tags still archive on GitHub-hosted runners;
-moving them is tracked in [#811](https://github.com/puritysb/AgentDeck/issues/811).
+selected Xcode and SDKs meet the minimum. [#811](https://github.com/puritysb/AgentDeck/issues/811)
+tracks the migration. Apple’s April 2027 notice specifies the iOS, iPadOS and
+watchOS 27 SDKs. The macOS archive uses the same Xcode toolchain.
 
 #### Store media keeps its richness
 
@@ -3842,9 +3876,19 @@ feed `scripts/appstore-demo-orchestrator.mjs`), not dropped. Lead with the live
 aquarium and the attention flow; feature captures such as Work follow it. Record
 the before/after counts per platform and locale in the release decision.
 
-Pending for the next macOS version: restore a preview video (re-recorded
-without the Collaboration panel) and lead with the current-feature aquarium,
-attention, devices and CI captures, keeping the Work captures after them.
+The [next macOS media selection](apple/appstore-submission/macos-next/selection.json)
+contains the re-recorded aquarium preview and seven ordered screenshots per
+locale. It starts with the current Aquarium, attention, connected devices,
+CI context and native Work attention captures, then reuses the wide and compact
+Work captures. The public macOS 2.2.0 listing has two screenshots and zero
+previews in each of English, Korean and Japanese. This candidate adds five
+screenshots and one preview to each locale.
+
+When the next macOS version is decided, bind this selection to its exact
+version in the guarded release workflow. After uploading to that editable
+version, run `asc-certificates.yml` with `store-status` and verify the order,
+counts, processing state and five-second preview poster before submitting
+for review.
 
 #### Guarded Apple review delivery
 
